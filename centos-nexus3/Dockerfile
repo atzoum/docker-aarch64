@@ -54,7 +54,7 @@ USER nexus
 WORKDIR ${NEXUS_HOME}
 
 ENV JAVA_MAX_MEM=1200m \
-  JAVA_MIN_MEM=1200m \
+  JAVA_MIN_MEM=600m \
   EXTRA_JAVA_OPTS=""
 
 CMD ["bin/nexus", "run"]
