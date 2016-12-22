@@ -18,7 +18,10 @@ ENV SONATYPE_DIR=/opt/sonatype
 ENV NEXUS_HOME=${SONATYPE_DIR}/nexus \
   NEXUS_DATA=/nexus-data \
   NEXUS_CONTEXT='' \
-  SONATYPE_WORK=${SONATYPE_DIR}/sonatype-work
+  SONATYPE_WORK=${SONATYPE_DIR}/sonatype-work \
+  JAVA_MAX_MEM=1200m \
+  JAVA_MIN_MEM=800m \
+  EXTRA_JAVA_OPTS=""
 
 # install Oracle JRE
 RUN mkdir -p /opt \
@@ -45,16 +48,16 @@ RUN sed \
 RUN useradd -r -u 200 -m -c "nexus role account" -d ${NEXUS_DATA} -s /bin/false nexus \
   && mkdir -p ${NEXUS_DATA}/etc ${NEXUS_DATA}/log ${NEXUS_DATA}/tmp ${SONATYPE_WORK} \
   && ln -s ${NEXUS_DATA} ${SONATYPE_WORK}/nexus3 \
-  && chown -R nexus:nexus ${NEXUS_DATA}
+  && chown -R nexus:nexus ${NEXUS_DATA} \
+  && sed \
+     -e "s|-Xms1200M|-Xms${JAVA_MIN_MEM}|g" \
+     -e "s|-Xmx1200M|-Xmx${JAVA_MAX_MEM}|g" \
+     -i "/opt/sonatype/nexus/bin/nexus.vmoptions"
 
 VOLUME ${NEXUS_DATA}
 
 EXPOSE 8081
 USER nexus
 WORKDIR ${NEXUS_HOME}
-
-ENV JAVA_MAX_MEM=1200m \
-  JAVA_MIN_MEM=600m \
-  EXTRA_JAVA_OPTS=""
 
 CMD ["bin/nexus", "run"]
