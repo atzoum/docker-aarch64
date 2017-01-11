@@ -4,3 +4,5 @@ This is essentially [Sonatype Nexus3 Docker Image](https://github.com/sonatype/d
 
 - `project31/aarch64-centos:7` as a base image
 - Oracle's JDK for arm64
+
+See [Dockerfile](https://github.com/atzoum/docker-aarch64/blob/master/aarch64-nexus3/Dockerfile)
