@@ -1,0 +1,88 @@
+#!groovy
+// Expecting the following variables to be set:
+// $DOCKER_HOSTNAME: the remote hostname of the Docker daemon to connect
+// $DOCKER_VERSION: the version number of the Docker release
+// $WORKSPACE_PATH: the workspace path (relevant to the docker daemon machine) where docker will be checked out and built
+//
+// Also requires a pair of username/password credentials to be setup in Jenkins with id 'dockerhub' for connecting to Docker Hub
+//
+def imageName = 'aarch64-docker'
+def dockerDir = 'docker'
+
+node {
+     
+    stage('checkout') {
+        git url: 'https://github.com/atzoum/docker-aarch64.git'
+    }
+    
+    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS']]) {
+        withEnv(["PATH+DOCKER=/var/jenkins_home/docker-1.12.5","DOCKER_HOST=tcp://${DOCKER_HOSTNAME}:2375"]) {
+            
+            stage('build') {
+                
+                echo "building ${imageName}"
+                sh """
+                     docker build -t ${DOCKER_USER}/${imageName}:${DOCKER_VERSION} ${imageName}/
+                """
+            }
+
+            stage('run') {
+                sh """
+                    # this is how we sudo, since Jenkins is running inside a Docker container...
+                    docker run -i --rm -v ${WORKSPACE_PATH}:/workspace aarch64/busybox /bin/rm -rf /workspace/${dockerDir}
+                    mkdir ${dockerDir}
+                    cd ${dockerDir} 
+                    docker run -i --rm \
+                     -v ${WORKSPACE_PATH}/docker:/workspace \
+                     -v /usr/bin/docker:/usr/bin/docker \
+                     -v /var/run/docker.sock:/var/run/docker.sock \
+                     --cpuset-cpus=0,1,2 \
+                     ${DOCKER_USER}/${imageName}:${DOCKER_VERSION} ${DOCKER_VERSION}
+                """
+            }
+
+            stage('archive') {
+                archive(includes: "docker/bundles/${DOCKER_VERSION}/tgz/linux/arm64/docker-${DOCKER_VERSION}.tgz")
+            }
+
+            stage('push') {
+                
+                echo "pushing ${imageName}"
+                sh """
+                     docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \
+                     docker push ${DOCKER_USER}/${imageName}:${DOCKER_VERSION}
+                """
+            }
+
+            stage('update description') {
+                
+                def fullDescription = readFile "${imageName}/README.md"
+                def token = readJson(
+                    sh(
+                        returnStdout: true, 
+                        script: "curl -s -H \"Content-Type: application/json\" -X POST -d '{\"username\": \"${DOCKER_USER}\", \"password\": \"${DOCKER_PASS}\"}\' https://hub.docker.com/v2/users/login/")
+                    ).token
+
+                httpRequest(
+                    url: "https://hub.docker.com/v2/repositories/atzoum/${imageName}/", 
+                    httpMode: 'PATCH', 
+                    requestBody: writeJson([full_description: fullDescription]), 
+                    customHeaders: [[name: 'Content-Type', value: 'application/json'], [name: 'Authorization', value: "JWT ${token}"]], 
+                    validResponseCodes: '200', 
+                    consoleLogResponseBody: true)
+            }
+
+        }
+    }
+}
+
+@NonCPS
+def readJson(String input) {
+  final slurper = new groovy.json.JsonSlurper()
+  return new HashMap<>(slurper.parseText(input))
+}
+
+@NonCPS
+def writeJson(v) {
+  groovy.json.JsonOutput.toJson(v)
+}
