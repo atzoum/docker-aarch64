@@ -3,12 +3,14 @@
 // $DOCKER_HOSTNAME: the remote hostname of the Docker daemon to connect
 // $DOCKER_VERSION: the version number of the Docker release
 // $WORKSPACE_PATH: the workspace path (relevant to the docker daemon machine) where docker will be checked out and built
-//
+// Please make sure to create a symbolic link (/docker-build-workspace -> ${WORKSPACE_PATH}/${dockerDir}) on the docker host so that the build process will place the binary artifacts in the correct place:
+// Eg. ln -s /nfs/swarm/data/jenkins/jenkins_home/workspace/docker-build_aarch64-docker/docker /docker-build-workspace
+// 
 // Also requires a pair of username/password credentials to be setup in Jenkins with id 'dockerhub' for connecting to Docker Hub
 //
 def imageName = 'aarch64-docker'
 def dockerDir = 'docker'
-
+def dockerBinariesPath = '/var/jenkins_home/docker-1.12.5'
 node {
      
     stage('checkout') {
@@ -16,7 +18,7 @@ node {
     }
     
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS']]) {
-        withEnv(["PATH+DOCKER=/var/jenkins_home/docker-1.12.5","DOCKER_HOST=tcp://${DOCKER_HOSTNAME}:2375"]) {
+        withEnv(["PATH+DOCKER=${dockerBinariesPath}","DOCKER_HOST=tcp://${DOCKER_HOSTNAME}:2375"]) {
             
             stage('build') {
                 
@@ -33,7 +35,7 @@ node {
                     mkdir ${dockerDir}
                     cd ${dockerDir} 
                     docker run -i --rm \
-                     -v ${WORKSPACE_PATH}/docker:/workspace \
+                     -v ${WORKSPACE_PATH}/docker:/docker-build-workspace \
                      -v /usr/bin/docker:/usr/bin/docker \
                      -v /var/run/docker.sock:/var/run/docker.sock \
                      --cpuset-cpus=0,1,2 \
@@ -42,7 +44,7 @@ node {
             }
 
             stage('archive') {
-                archive(includes: "docker/bundles/${DOCKER_VERSION}/tgz/linux/arm64/docker-${DOCKER_VERSION}.tgz")
+                archive(includes: "${dockerDir}/bundles/${DOCKER_VERSION}/tgz/linux/arm64/docker-${DOCKER_VERSION}.tgz")
             }
 
             stage('push') {

@@ -9,7 +9,7 @@ RUN set -xe \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-VOLUME /workspace
+VOLUME /docker-build-workspace
 COPY build.sh /build.sh
 ENTRYPOINT ["/build.sh"]
 CMD ["1.12.6"]
