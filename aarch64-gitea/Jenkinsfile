@@ -16,9 +16,13 @@ node {
                 sh """
                      docker build -t ${DOCKER_USER}/aarch64-gitea-builder -f ${imageName}/Dockerfile.build ${imageName}/
                      docker run -i --rm -v ${workspaceDir}/${imageName}/:/binary atzoum/aarch64-gitea-builder
-                     
-                     docker build -t ${DOCKER_USER}/${imageName} ${imageName}/
                 """
+                dir(imageName) {
+                    stash name: "giteastash", includes: "README.md,Dockerfile"
+                    git(url: 'https://github.com/go-gitea/gitea.git', branch: 'master')
+                    unstash "giteastash"
+                }
+                sh "docker build -t ${DOCKER_USER}/${imageName} ${imageName}/"
             }
 
             stage('push') {
