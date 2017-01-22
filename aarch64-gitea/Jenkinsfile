@@ -5,12 +5,6 @@ node {
 
     stage('checkout') {
         git url: 'https://github.com/atzoum/docker-aarch64.git'
-        
-        dir(imageName) {
-            stash name: "README.md", includes: "README.md"
-            git(url: 'https://github.com/atzoum/gogs.git', branch: 'aarch64')
-            unstash "README.md"
-        }
     }
     
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS']]) {
