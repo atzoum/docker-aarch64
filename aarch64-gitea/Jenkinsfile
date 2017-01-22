@@ -15,7 +15,7 @@ node {
                 echo "building binary"
                 sh """
                      docker build -t ${DOCKER_USER}/aarch64-gitea-builder -f ${imageName}/Dockerfile.build ${imageName}/
-                     docker run -ti -v /nfs/swarm/:/binary atzoum/aarch64-gitea-builder
+                     docker run -i --rm -v /nfs/swarm/:/binary atzoum/aarch64-gitea-builder
                      cp /nfs/swarm/gitea ${imageName}/gitea
                      docker build -t ${DOCKER_USER}/${imageName} ${imageName}/
                 """
