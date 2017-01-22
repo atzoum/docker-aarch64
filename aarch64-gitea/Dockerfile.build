@@ -1,0 +1,11 @@
+FROM aarch64/alpine:3.5
+
+RUN apk update && \
+  apk add su-exec ca-certificates sqlite bash git linux-pam s6 curl openssh tzdata build-base linux-pam-dev go && \
+  rm -rf /var/cache/apk/* 
+
+COPY /build.sh /build.sh
+
+VOLUME ["/binary"]
+
+ENTRYPOINT ["/build.sh"]

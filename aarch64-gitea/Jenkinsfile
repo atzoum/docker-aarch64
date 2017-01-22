@@ -1,0 +1,69 @@
+#!groovy
+
+node {
+    def imageName = 'aarch64-gitea'
+
+    stage('checkout') {
+        git url: 'https://github.com/atzoum/docker-aarch64.git'
+        
+        dir(imageName) {
+            stash name: "README.md", includes: "README.md"
+            git(url: 'https://github.com/atzoum/gogs.git', branch: 'aarch64')
+            unstash "README.md"
+        }
+    }
+    
+    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS']]) {
+        withEnv(["PATH+DOCKER=/var/jenkins_home/docker-1.12.5","DOCKER_HOST=tcp://${DOCKER_HOSTNAME}:2375"]) {
+            
+            stage('build') {
+                
+                echo "building binary"
+                sh """
+                     docker build -t ${DOCKER_USER}/aarch64-gitea-builder -f ${imageName}/Dockerfile.build ${imageName}/
+                     docker run -ti -v /nfs/swarm/:/binary atzoum/aarch64-gitea-builder
+                     cp /nfs/swarm/gitea ${imageName}/gitea
+                     docker build -t ${DOCKER_USER}/${imageName} ${imageName}/
+                """
+            }
+
+            stage('push') {
+                
+                echo "pushing ${imageName}"
+                sh """
+                     docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \
+                     docker push ${DOCKER_USER}/${imageName}
+                """
+            }
+
+            stage('update description') {
+                
+                def fullDescription = readFile "${imageName}/README.md"
+                def token = readJson(
+                    sh(
+                        returnStdout: true, 
+                        script: "curl -s -H \"Content-Type: application/json\" -X POST -d '{\"username\": \"${DOCKER_USER}\", \"password\": \"${DOCKER_PASS}\"}\' https://hub.docker.com/v2/users/login/")
+                    ).token
+
+                httpRequest(
+                    url: "https://hub.docker.com/v2/repositories/atzoum/${imageName}/", 
+                    httpMode: 'PATCH', 
+                    requestBody: writeJson([full_description: fullDescription]), 
+                    customHeaders: [[name: 'Content-Type', value: 'application/json'], [name: 'Authorization', value: "JWT ${token}"]], 
+                    validResponseCodes: '200', 
+                    consoleLogResponseBody: true)
+            }
+        }
+    }
+}
+
+@NonCPS
+def readJson(String input) {
+  final slurper = new groovy.json.JsonSlurper()
+  return new HashMap<>(slurper.parseText(input))
+}
+
+@NonCPS
+def writeJson(v) {
+  groovy.json.JsonOutput.toJson(v)
+}
