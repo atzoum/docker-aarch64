@@ -12,7 +12,6 @@ git clone --depth 1 --single-branch https://github.com/go-gitea/gitea.git /app/g
 mkdir -p ${GOPATH}/src/code.gitea.io/
 ln -s /app/gitea ${GOPATH}/src/code.gitea.io/
 cd ${GOPATH}/src/code.gitea.io/gitea
-ls -la
 #glide install
 TAGS="bindata sqlite pam" make generate build
 
