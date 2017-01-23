@@ -8,12 +8,13 @@ node {
     }
     
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS']]) {
-        withEnv(["PATH+DOCKER=/var/jenkins_home/docker-1.12.5","DOCKER_HOST=tcp://${DOCKER_HOSTNAME}:2375"]) {
+        withEnv(["PATH+DOCKER=/var/jenkins_home/docker-1.12.5","PATH+GIT=${ tool 'git'}","DOCKER_HOST=tcp://${DOCKER_HOSTNAME}:2375"]) {
             
             stage('build') {
                 
                 echo "building binary"
                 sh """
+                     git clean -df
                      docker build -t ${DOCKER_USER}/aarch64-gitea-builder -f ${imageName}/Dockerfile.build ${imageName}/
                      docker run -i --rm -v ${workspaceDir}/${imageName}/:/binary atzoum/aarch64-gitea-builder
                 """
