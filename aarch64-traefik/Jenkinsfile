@@ -17,6 +17,14 @@ node {
                      docker build -t ${DOCKER_USER}/${imageName} ${imageName}/
                 """
             }
+            
+            stage('test') {
+                
+                echo "testing ${imageName}"
+                sh """
+                     docker run --rm ${DOCKER_USER}/${imageName} --help
+                """
+            }
 
             stage('push') {
                 
