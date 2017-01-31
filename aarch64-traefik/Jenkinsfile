@@ -22,7 +22,7 @@ node {
                 
                 echo "testing ${imageName}"
                 sh """
-                     docker run --rm ${DOCKER_USER}/${imageName} --help
+                     docker run --rm ${DOCKER_USER}/${imageName} version
                 """
             }
 
