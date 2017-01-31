@@ -1,4 +1,4 @@
-FROM aarch64/alpine:3.5
+FROM aarch64/alpine
 RUN apk update &&\
     apk upgrade &&\
     apk add ca-certificates &&\
