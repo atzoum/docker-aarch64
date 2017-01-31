@@ -1,4 +1,4 @@
-FROM hypriot/rpi-alpine-scratch
+FROM aarch64/alpine:3.5
 RUN apk update &&\
     apk upgrade &&\
     apk add ca-certificates &&\
