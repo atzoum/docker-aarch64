@@ -1,4 +1,4 @@
-Traefik Docker Image for aarch64 (atzoum/aarch64-influxdb)
+Traefik Docker Image for aarch64 (atzoum/aarch64-traefik)
 ===========================================================
 
 - `aarch64/alpine` base image
