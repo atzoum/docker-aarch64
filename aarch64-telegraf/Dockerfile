@@ -1,6 +1,6 @@
 FROM aarch64/alpine
 
-ENV TELEGRAF_VERSION 1.1.2
+ENV TELEGRAF_VERSION 1.2.1
 ENV TELEGRAF_FILE telegraf-${TELEGRAF_VERSION}_linux_arm64.tar.gz
 ENV TELEGRAF_URL https://dl.influxdata.com/telegraf/releases/${TELEGRAF_FILE}
 
