@@ -12,4 +12,4 @@ RUN set -xe \
 VOLUME /docker-build-workspace
 COPY build.sh /build.sh
 ENTRYPOINT ["/build.sh"]
-CMD ["1.13.0"]
+CMD ["1.13.1"]
