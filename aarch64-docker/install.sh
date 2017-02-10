@@ -1,5 +1,5 @@
 #!/bin/sh
-DOCKER_VERSION=1.13.0 && \
+DOCKER_VERSION=1.13.1 && \
 echo "stopping docker service" && \
 systemctl stop docker.service && \
 echo "downloading docker-${DOCKER_VERSION}.tgz to /tmp/" && \
