@@ -5,7 +5,7 @@ Used for building docker aarch64 binaries through a "dockerized" Jenkins
 
 See [Dockerfile](https://github.com/atzoum/docker-aarch64/blob/master/aarch64-docker/Dockerfile)
 
-Installing latest Docker binaries (v1.13.0) in an aarch64 machine
+Installing latest Docker binaries (v1.13.1) in an aarch64 machine
 =================================================================
 
 ````
