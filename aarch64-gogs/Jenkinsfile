@@ -9,7 +9,6 @@ node {
         dir(imageName) {
             stash name: "README.md", includes: "README.md"
             git(url: 'https://github.com/gogits/gogs.git', branch: 'master')
-            sh "git checkout v0.9.141"
             unstash "README.md"
         }
     }
