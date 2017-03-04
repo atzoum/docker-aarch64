@@ -13,7 +13,7 @@ node {
                 
                 echo "building ${imageName}"
                 sh """
-                     docker build -t ${DOCKER_USER}/${imageName} ${imageName}/
+                docker build --build-arg TELEGRAF_VERSION=${TELEGRAF_VERSION} -t ${DOCKER_USER}/${imageName} ${imageName}/
                 """
             }
 
@@ -23,6 +23,8 @@ node {
                 sh """
                      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \
                      docker push ${DOCKER_USER}/${imageName}
+                     docker tag ${DOCKER_USER}/${imageName} ${DOCKER_USER}/${imageName}:${TELEGRAF_VERSION} && \\
+                     docker push ${DOCKER_USER}/${imageName}:${TELEGRAF_VERSION}
                 """
             }
 
