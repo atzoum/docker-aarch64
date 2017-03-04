@@ -16,6 +16,7 @@ node {
                 sh """
                      git clean -df
                      docker build -t ${DOCKER_USER}/aarch64-gitea-builder -f ${imageName}/Dockerfile.build ${imageName}/
+                     mkdir -p ${workspaceDir}/${imageName}/gitea
                      docker run -i --rm -v ${workspaceDir}/${imageName}/:/binary atzoum/aarch64-gitea-builder
                 """
                 dir(imageName) {
