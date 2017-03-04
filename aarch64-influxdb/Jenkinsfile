@@ -14,7 +14,7 @@ node {
                 
                 echo "building ${imageName}"
                 sh """
-                docker build -t --build-arg INFLUXDB_VERSION=${INFLUXDB_VERSION} ${DOCKER_USER}/${imageName} ${imageName}/
+                docker build --build-arg INFLUXDB_VERSION=${INFLUXDB_VERSION} -t ${DOCKER_USER}/${imageName} ${imageName}/
                 """
             }
 
