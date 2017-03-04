@@ -14,7 +14,7 @@ node {
                 
                 echo "building ${imageName}"
                 sh """
-                     docker build -t ${DOCKER_USER}/${imageName} ${imageName}/
+                docker build -t --build-arg INFLUXDB_VERSION=${INFLUXDB_VERSION} ${DOCKER_USER}/${imageName} ${imageName}/
                 """
             }
 
@@ -24,6 +24,8 @@ node {
                 sh """
                      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \
                      docker push ${DOCKER_USER}/${imageName}
+                     docker tag ${DOCKER_USER}/${imageName} ${DOCKER_USER}/${imageName}:${INFLUXDB_VERSION} && \\
+                     docker push ${DOCKER_USER}/${imageName}:${INFLUXDB_VERSION}
                 """
             }
 
