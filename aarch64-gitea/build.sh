@@ -14,5 +14,4 @@ ln -s /app/gitea ${GOPATH}/src/code.gitea.io/
 cd ${GOPATH}/src/code.gitea.io/gitea
 #glide install
 TAGS="bindata sqlite pam" make generate build
-mkdir -p /binary/gitea
-cp /app/gitea/gitea /binary/gitea
+cp /app/gitea/gitea /binary/
