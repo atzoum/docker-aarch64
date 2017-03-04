@@ -1,7 +1,7 @@
 FROM aarch64/debian:jessie
 
 ARG INFLUXDB_VERSION
-ENV INFLUXDB_VERSION=${INFLUXDB_VERSION:-v1.2.0}
+ENV INFLUXDB_VERSION=v${INFLUXDB_VERSION:-1.2.0}
 ENV INFLUXDB_FILE=influxdb_${INFLUXDB_VERSION}_arm64.deb
 ENV INFLUXDB_URL=https://dl.influxdata.com/influxdb/releases/${INFLUXDB_FILE}
 ENV COLLECTD_URL=https://github.com/collectd/collectd/raw/master/src/types.db
