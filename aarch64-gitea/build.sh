@@ -8,7 +8,7 @@ export PATH=${PATH}:${GOPATH}/bin
 #export GO15VENDOREXPERIMENT=1
 
 # Build Gogs
-git clone --depth 1 --single-branch https://github.com/go-gitea/gitea.git /app/gitea
+git clone -b $1 --depth 1 --single-branch https://github.com/go-gitea/gitea.git /app/gitea
 mkdir -p ${GOPATH}/src/code.gitea.io/
 ln -s /app/gitea ${GOPATH}/src/code.gitea.io/
 cd ${GOPATH}/src/code.gitea.io/gitea
