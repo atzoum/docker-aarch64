@@ -3,6 +3,7 @@
 node {
     def imageName = 'aarch64-gitea'
     def tagName = env.GITEA_TAG  ?: 'latest'
+    def branchName = env.GITEA_TAG  ? "v${GITEA_TAG}" : "master"
     stage('checkout') {
         git url: 'https://github.com/atzoum/docker-aarch64.git'
     }
@@ -16,13 +17,13 @@ node {
                 sh """
                      git clean -df
                      docker build -t ${DOCKER_USER}/aarch64-gitea-builder -f ${imageName}/Dockerfile.build ${imageName}/
-                     docker run -i --rm -v ${workspaceDir}/${imageName}/:/binary atzoum/aarch64-gitea-builder
+                     docker run -i --rm -v ${workspaceDir}/${imageName}/:/binary atzoum/aarch64-gitea-builder ${branchName}
                 """
                 dir(imageName) {
                     stash name: "giteastash", includes: "README.md,Dockerfile"
                     git(url: 'https://github.com/go-gitea/gitea.git', branch: 'master')
                     if (env.GITEA_TAG) {
-                        sh "git checkout v${GITEA_TAG}"
+                        sh "git checkout ${branchName}"
                     }
                     unstash "giteastash"
                 }
