@@ -35,7 +35,7 @@ node {
                 echo "pushing ${imageName}"
                 sh """
                      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \
-                     docker push ${DOCKER_USER}/${imageName}:tagName
+                     docker push ${DOCKER_USER}/${imageName}:${tagName}
                 """
             }
 
