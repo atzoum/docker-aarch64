@@ -2,7 +2,7 @@
 
 node {
     def imageName = 'aarch64-gitea'
-
+    def tagName = env.GITEA_TAG  ?: 'latest'
     stage('checkout') {
         git url: 'https://github.com/atzoum/docker-aarch64.git'
     }
@@ -21,9 +21,12 @@ node {
                 dir(imageName) {
                     stash name: "giteastash", includes: "README.md,Dockerfile"
                     git(url: 'https://github.com/go-gitea/gitea.git', branch: 'master')
+                    if (env.GITEA_TAG) {
+                        sh "git checkout v${GITEA_TAG}"
+                    }
                     unstash "giteastash"
                 }
-                sh "docker build -t ${DOCKER_USER}/${imageName} ${imageName}/"
+                sh "docker build -t ${DOCKER_USER}/${imageName}:${tagName} ${imageName}/"
             }
 
             stage('push') {
@@ -31,7 +34,7 @@ node {
                 echo "pushing ${imageName}"
                 sh """
                      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \
-                     docker push ${DOCKER_USER}/${imageName}
+                     docker push ${DOCKER_USER}/${imageName}:tagName
                 """
             }
 
