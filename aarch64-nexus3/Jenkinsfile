@@ -14,7 +14,7 @@ node {
                 
                 echo "building ${imageName}"
                 sh """
-                     docker build -t ${DOCKER_USER}/${imageName} ${imageName}/
+                     docker build -t ${DOCKER_USER}/${imageName}:${NEXUS_VERSION} ${imageName}/
                 """
             }
 
@@ -22,8 +22,10 @@ node {
                 
                 echo "pushing ${imageName}"
                 sh """
-                     docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \
-                     docker push ${DOCKER_USER}/${imageName}
+                     docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \\
+                     docker tag ${DOCKER_USER}/${imageName}:${NEXUS_VERSION} ${DOCKER_USER}/${imageName}:latest && \\
+                     docker push ${DOCKER_USER}/${imageName}:${NEXUS_VERSION} && \\
+                     docker push ${DOCKER_USER}/${imageName}:latest
                 """
             }
 
