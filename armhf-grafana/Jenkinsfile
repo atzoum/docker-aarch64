@@ -2,7 +2,7 @@
 
 node {
     def imageName = 'armhf-grafana'
-
+    def tagName = env.GRAFANA_VERSION ?: 'latest'
     stage('checkout') {
         git url: 'https://github.com/atzoum/docker-aarch64.git'
     }
@@ -14,7 +14,7 @@ node {
                 
                 echo "building ${imageName}"
                 sh """
-                     docker build -t ${DOCKER_USER}/${imageName} ${imageName}/
+                     docker build -t ${DOCKER_USER}/${imageName}:${tagName} ${imageName}/
                 """
             }
 
@@ -23,7 +23,7 @@ node {
                 echo "pushing ${imageName}"
                 sh """
                      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \
-                     docker push ${DOCKER_USER}/${imageName}
+                     docker push ${DOCKER_USER}/${imageName}:${tagName}
                 """
             }
 

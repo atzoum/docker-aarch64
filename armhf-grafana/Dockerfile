@@ -1,6 +1,6 @@
 FROM armhf/debian:jessie
-
-ENV GRAFANA_VERSION=4.2.0
+ARG GRAFANA_VERSION
+ENV GRAFANA_VERSION ${GRAFANA_VERSION:-4.2.0}
 ENV GRAFANA_FILE=grafana_${GRAFANA_VERSION}_armhf.deb
 ENV GRAFANA_URL=https://github.com/fg2it/grafana-on-raspberry/releases/download/v${GRAFANA_VERSION}/${GRAFANA_FILE}
 
