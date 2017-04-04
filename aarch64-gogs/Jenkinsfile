@@ -2,13 +2,18 @@
 
 node {
     def imageName = 'aarch64-gogs'
+    def tagName = env.GOGS_TAG  ?: 'latest'
+    def branchName = env.GOGS_TAG  ? "v${GOGS_TAG}" : "master"
 
     stage('checkout') {
         git url: 'https://github.com/atzoum/docker-aarch64.git'
         
         dir(imageName) {
             stash name: "README.md", includes: "README.md"
-            git(url: 'https://github.com/gogits/gogs.git', branch: "${env.GOGS_BRANCH ?: 'master'}")
+            sh """
+            rm -rf * .git
+            git clone -b ${branchName} --depth 1 --single-branch https://github.com/gogits/gogs.git .
+            """
             unstash "README.md"
         }
     }
@@ -20,7 +25,7 @@ node {
                 
                 echo "building ${imageName}"
                 sh """
-                     docker build -t ${DOCKER_USER}/${imageName} -f ${imageName}/Dockerfile.aarch64 ${imageName}/
+                     docker build -t ${DOCKER_USER}/${imageName}:${tagName} -f ${imageName}/Dockerfile.aarch64 ${imageName}/
                 """
             }
 
@@ -29,7 +34,7 @@ node {
                 echo "pushing ${imageName}"
                 sh """
                      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS" && \
-                     docker push ${DOCKER_USER}/${imageName}
+                     docker push ${DOCKER_USER}/${imageName}:${tagName}
                 """
             }
 
