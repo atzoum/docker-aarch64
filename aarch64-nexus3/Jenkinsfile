@@ -14,7 +14,7 @@ node {
                 
                 echo "building ${imageName}"
                 sh """
-                     docker build -t ${DOCKER_USER}/${imageName}:${NEXUS_VERSION} ${imageName}/
+                     docker build -t ${DOCKER_USER}/${imageName}:${NEXUS_VERSION} --build-arg NEXUS_VERSION=${NEXUS_VERSION} ${imageName}/
                 """
             }
 
