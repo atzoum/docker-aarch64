@@ -1,5 +1,5 @@
 # docker-aarch64
-An assortment of Dockerfiles used for building Docker images for aarch64, available in [Docker Hub](https://hub.docker.com/r/atzoum/). A Jenkinsfile accompanies each Dockerfile for building the image in a self-provisioned jenkins.
+An assortment of Dockerfiles used for building Docker images for aarch64, available in [Docker Hub](https://hub.docker.com/r/atzoum/). A Jenkinsfile accompanies each Dockerfile for building and publishing the image in a self-provisioned jenkins.
 
 ## Available images
 
