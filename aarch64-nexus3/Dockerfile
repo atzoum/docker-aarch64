@@ -1,6 +1,6 @@
 FROM project31/aarch64-centos:7
 
-ARG NEXUS_VERSION=3.2.1-01
+ARG NEXUS_VERSION=3.6.1-02
 ARG NEXUS_DOWNLOAD_URL=https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-unix.tar.gz
 
 RUN yum install -y \
